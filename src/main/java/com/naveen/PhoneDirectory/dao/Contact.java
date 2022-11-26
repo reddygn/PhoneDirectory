@@ -6,7 +6,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class ContactsDao {
+public class Contact {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,16 +15,8 @@ public class ContactsDao {
 	private String firstName;
 	private String lastName;
 	private String company;
-	private String phoneNumber;
 	private String emailAddress;
-
-	public Integer getId() {
-		return id;
-	}
-
-//	public void setId(Long id) {
-//		this.id = id;
-//	}
+	
 
 	public String getFirstName() {
 		return firstName;
@@ -50,20 +42,16 @@ public class ContactsDao {
 		this.company = company;
 	}
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
-
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-
 	public String getEmailAddress() {
 		return emailAddress;
 	}
 
 	public void setEmailAddress(String emailAddress) {
 		this.emailAddress = emailAddress;
+	}
+
+	public Integer getId() {
+		return id;
 	}
 
 }

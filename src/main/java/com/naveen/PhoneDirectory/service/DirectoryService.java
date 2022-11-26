@@ -1,5 +1,6 @@
 package com.naveen.PhoneDirectory.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,9 +9,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.naveen.PhoneDirectory.ContacRepository;
-import com.naveen.PhoneDirectory.dao.ContactsDao;
+import com.naveen.PhoneDirectory.dao.Contact;
+import com.naveen.PhoneDirectory.dao.Phone;
 import com.naveen.PhoneDirectory.model.ContactDto;
+import com.naveen.PhoneDirectory.model.PhoneDto;
+import com.naveen.PhoneDirectory.repository.ContacRepository;
+import com.naveen.PhoneDirectory.repository.PhoneRepository;
 
 @Service
 public class DirectoryService {
@@ -20,33 +24,84 @@ public class DirectoryService {
 	@Autowired
 	ContacRepository contacRepository;
 
-	public List<ContactsDao> getAllContacts() {
-		List<ContactsDao> contacts = contacRepository.findAll();
-		return contacts;
+	@Autowired
+	PhoneRepository phoneRepository;
+
+	public List<ContactDto> getAllContacts() {
+
+		List<Contact> contacts = contacRepository.findAll();
+
+		List<ContactDto> contactsDto = getAllContactsHelper(contacts);
+
+		return contactsDto;
 	}
 
-	public List<ContactsDao> getAllContactsByName(String name) {
+	private List<ContactDto> getAllContactsHelper(List<Contact> contacts) {
+		List<ContactDto> contactsDto = new ArrayList<ContactDto>();
 
-		List<ContactsDao> contactResponse = contacRepository.findAllByFirstName(name);
+		for (Contact contact : contacts) {
+			ContactDto c = new ContactDto();
+
+			c.setCompany(contact.getCompany());
+			c.setEmailAddress(contact.getEmailAddress());
+			c.setFirstName(contact.getFirstName());
+			c.setLastName(contact.getLastName());
+			List<PhoneDto> phonesDto = new ArrayList<PhoneDto>();
+			PhoneDto pDto = new PhoneDto();
+
+			List<Phone> phones = phoneRepository.findAllByContactId(contact.getId());
+			for (Phone p : phones) {
+				pDto.setPhoneNumber(p.getPhoneNumber());
+				phonesDto.add(pDto);
+			}
+
+			c.setPhoneNumbers(phonesDto);
+			contactsDto.add(c);
+		}
+		return contactsDto;
+	}
+
+	public List<ContactDto> getAllContactsByName(String name) {
+
+		List<Contact> contactResponse = contacRepository.findAllByFirstName(name);
 		contactResponse.addAll(contacRepository.findAllByLastName(name));
 
-		return contactResponse;
+		List<ContactDto> contactsDto = getAllContactsHelper(contactResponse);
+
+		return contactsDto;
 	}
 
-	public ContactsDao getContactById(Integer id) {
+	public ContactDto getContactById(Integer id) {
 
-		ContactsDao c = contacRepository.findById(id).orElse(null);
-		return c;
+		Contact c = contacRepository.findById(id).orElse(null);
+
+		List<Contact> contactResponse = new ArrayList<Contact>();
+		contactResponse.add(c);
+		List<ContactDto> contactsDto = getAllContactsHelper(contactResponse);
+
+		return contactsDto.get(0);
 
 	}
 
-	public List<ContactsDao> deleteContactById(Integer id) {
+	public List<Contact> deleteContactById(Integer id) {
 		try {
-			ContactsDao c = contacRepository.findById(id).orElse(null);
-			if (c != null)
+
+			Contact c = contacRepository.findById(id).orElse(null);
+			if (c != null) {
+				List<Phone> phoneList = phoneRepository.findAllByContactId(c.getId());
+				if (phoneList.size() > 0) {
+					for (Phone ph : phoneList) {
+						if (ph != null) {
+							phoneRepository.delete(ph);
+
+						}
+					}
+				}
 				contacRepository.deleteById(id);
-			else
+
+			} else {
 				throw new NullPointerException();
+			}
 
 		} catch (NullPointerException e) {
 			logger.error("No record found for given Id = " + id, e);
@@ -56,9 +111,9 @@ public class DirectoryService {
 		return contacRepository.findAll();
 	}
 
-	public ContactsDao updateContact(ContactDto contactDto, Integer id) {
+	public Contact updateContact(ContactDto contactDto, Integer id) {
 
-		ContactsDao contact = new ContactsDao();
+		Contact contact = new Contact();
 		try {
 			contact = contacRepository.findById(id).orElse(null);
 			if (contact != null) {
@@ -82,21 +137,31 @@ public class DirectoryService {
 
 		try {
 
-			ContactsDao contactDao = new ContactsDao();
+			addContactHelper(contactRequest);
 
-			BeanUtils.copyProperties(contactRequest, contactDao);
-
-			contacRepository.saveAndFlush(contactDao);
 		} catch (Exception e) {
-			logger.error("Exception occured while fetching the contatcs. Details: {}", e.getMessage(), e);
+			logger.error("Exception occured while adding the contact. Details: {}", e.getMessage(), e);
 		}
 
 		return contactRequest;
 	}
 
-	public List<ContactsDao> deleteAllContacts() {
-		contacRepository.deleteAll();
+	private void addContactHelper(ContactDto contactRequest) {
+		Contact contactDao = new Contact();
 
-		return contacRepository.findAll();
+		BeanUtils.copyProperties(contactRequest, contactDao);
+		Contact contactResponse = contacRepository.saveAndFlush(contactDao);
+
+		List<PhoneDto> phoneNumbers = contactRequest.getPhoneNumbers();
+
+		for (PhoneDto p : phoneNumbers) {
+
+			Phone phone = new Phone();
+			phone.setPhoneNumber(p.getPhoneNumber());
+			phone.setContactId(contactResponse.getId());
+
+			phoneRepository.saveAndFlush(phone);
+		}
 	}
+
 }

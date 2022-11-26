@@ -1,11 +1,13 @@
 package com.naveen.PhoneDirectory.model;
 
+import java.util.List;
+
 public class ContactDto {
 
 	private String firstName;
 	private String lastName;
 	private String company;
-	private String phoneNumber;
+	private List<PhoneDto> phoneNumbers;
 	private String emailAddress;
 
 	public String getFirstName() {
@@ -32,12 +34,12 @@ public class ContactDto {
 		this.company = company;
 	}
 
-	public String getPhoneNumber() {
-		return phoneNumber;
+	public List<PhoneDto> getPhoneNumbers() {
+		return phoneNumbers;
 	}
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
+	public void setPhoneNumbers(List<PhoneDto> phoneNumbers) {
+		this.phoneNumbers = phoneNumbers;
 	}
 
 	public String getEmailAddress() {

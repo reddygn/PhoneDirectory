@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.naveen.PhoneDirectory.dao.ContactsDao;
+import com.naveen.PhoneDirectory.dao.Contact;
 import com.naveen.PhoneDirectory.model.ContactDto;
 import com.naveen.PhoneDirectory.service.DirectoryService;
 
@@ -25,31 +25,31 @@ public class DirectoryController {
 
 	// 1. Get All Contacts
 	@GetMapping
-	public List<ContactsDao> getAllContacts() {
+	public List<ContactDto> getAllContacts() {
 		return directoryService.getAllContacts();
 	}
 
 	// 2. Get All Contacts By Name
 	@GetMapping(value = "/{name}")
-	public List<ContactsDao> getAllContactsByName(@PathVariable String name) {
+	public List<ContactDto> getAllContactsByName(@PathVariable String name) {
 		return directoryService.getAllContactsByName(name);
 	}
 
 	// 3. Get A Specific Contact By Id
 	@GetMapping(value = "/id/{id}")
-	public ContactsDao getContactById(@PathVariable("id") Integer id) {
+	public ContactDto getContactById(@PathVariable("id") Integer id) {
 		return directoryService.getContactById(id);
 	}
 
 	// 4. Delete A Contact By Id
 	@DeleteMapping(value = "/{id}")
-	public List<ContactsDao> deleteContactById(@PathVariable Integer id) {
+	public List<Contact> deleteContactById(@PathVariable Integer id) {
 		return directoryService.deleteContactById(id);
 	}
 
 	// 5. Update A Contact
 	@PutMapping(value = "/{id}")
-	public ContactsDao updateContact(@org.springframework.web.bind.annotation.RequestBody ContactDto contactDto,
+	public Contact updateContact(@org.springframework.web.bind.annotation.RequestBody ContactDto contactDto,
 			@PathVariable Integer id) {
 		return directoryService.updateContact(contactDto, id);
 	}
@@ -59,12 +59,6 @@ public class DirectoryController {
 	public ContactDto addContact(@org.springframework.web.bind.annotation.RequestBody ContactDto contactRequest) {
 
 		return directoryService.addContact(contactRequest);
-	}
-
-	// 7. Delete All Contacts
-	@DeleteMapping
-	public List<ContactsDao> deleteAllContacts() {
-		return directoryService.deleteAllContacts();
 	}
 
 }
