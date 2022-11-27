@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.naveen.PhoneDirectory.dao.Contact;
 import com.naveen.PhoneDirectory.model.ContactDto;
+import com.naveen.PhoneDirectory.model.PhoneDto;
 import com.naveen.PhoneDirectory.service.DirectoryService;
 
 @RestController

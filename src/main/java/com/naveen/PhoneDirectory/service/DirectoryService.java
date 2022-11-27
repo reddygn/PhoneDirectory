@@ -111,14 +111,15 @@ public class DirectoryService {
 		return contacRepository.findAll();
 	}
 
-	public Contact updateContact(ContactDto contactDto, Integer id) {
+	public Contact updateContact(ContactDto contactRequest, Integer id) {
 
 		Contact contact = new Contact();
+
 		try {
 			contact = contacRepository.findById(id).orElse(null);
 			if (contact != null) {
 
-				BeanUtils.copyProperties(contactDto, contact);
+				BeanUtils.copyProperties(contactRequest, contact);
 
 				contacRepository.saveAndFlush(contact);
 			} else {
